@@ -62,15 +62,13 @@ Icon.Default.mergeOptions({
             }))
             return arr
         },
-        center(){
-            return this.$store.state.mapPoints.length>0 ?  [this.$store.state.mapPoints[0].position.lat,this.$store.state.mapPoints[0].position.lng] : [50.493430, 18.014206]
-        },
         zoom(){
           return 15
         }
     },
     data() {
       return {
+        center:[51,51],
         polyline: {
           latlngs: [
             [47.334852, -1.509485],
@@ -85,6 +83,9 @@ Icon.Default.mergeOptions({
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       };
     },
+    mounted(){
+      this.getMyPosition()
+    },
     methods: {
       clickBtn() {
         this.rectangle.style.weight++;
@@ -93,6 +94,13 @@ Icon.Default.mergeOptions({
       },
       test(e){
         console.log(e)
+      },
+      getMyPosition(){
+        navigator.geolocation.getCurrentPosition((position) => {
+            let lat = position.coords.latitude
+            let long = position.coords.longitude
+            this.center = [lat,long]
+        });
       }
     }
   };

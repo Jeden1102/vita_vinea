@@ -9,7 +9,7 @@ export default new Vuex.Store({
     },
     mutations: {
         addPoint(state, point) {
-            state.mapPoints.push({ position: point })
+            state.mapPoints.push({ position: point, base: false })
         },
         removePoint(state, idx) {
             console.log('tak')

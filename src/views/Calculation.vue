@@ -11,12 +11,25 @@
             <th>Lat</th>
             <th>Lon</th>
             <th>Akcje</th>
+            <th>Podstawa</th>
         </tr>
         <tr v-for="(point,idx) in this.$store.state.mapPoints" :key="idx">
             <td>{{ idx }}</td>
             <td>{{ point.position.lng }}</td>
             <td>{{ point.position.lat }}</td>
-            <td><button @click="removePoint(idx)" class="button button--error">Usuń</button></td>
+            <td>
+              <button @click="removePoint(idx)" class="button button--error">Usuń</button>
+            </td>
+            <td>
+              <div class="checkbox-wrapper-31">
+                <input type="checkbox" v-model="point.base" :disabled="checkBoxDisabled && !point.base"/>
+                <svg viewBox="0 0 35.6 35.6">
+                  <circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                  <circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                  <polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+                </svg>
+              </div>
+            </td>
         </tr>
         </table>
         </div>
@@ -33,13 +46,14 @@
         <input type="number" v-model="spacePlant" class="base-input" placeholder="Wpisz odległość pomiędzy sadzonkami (m)">
         <label for="">Odległość między słupkami środkowymi (m)</label>
         <input type="number" v-model="spacePall" class="base-input" placeholder="Wpisz odległość pomiędzy słupkami (m)">
-        <button class="button button--success">Generuj wyniki</button>
+        <button @click="generateResults" class="button button--success">Generuj wyniki</button>
       </div>
     </div>
   </template>
   
   <script>
   import MapView from '@/components/MapView.vue';
+  import html2pdf from "html2pdf.js";
   export default {
     name: 'Home',
     components: {
@@ -50,6 +64,11 @@
         spaceRow:'',
         spacePlant:'',
         spacePall:'',
+      }
+    },
+    computed:{
+      checkBoxDisabled(){
+        return this.$store.state.mapPoints.filter(point=>point.base == true).length > 1;
       }
     },
     methods:{
@@ -64,6 +83,9 @@
         },
         removePoint(idx){
             this.$store.commit('removePoint',idx)
+        },
+        generateResults(){
+          html2pdf(document.querySelector('.home'));
         }
     }
   }

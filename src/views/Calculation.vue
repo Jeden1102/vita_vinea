@@ -1,11 +1,19 @@
 <template>
     <div class="home">
+      <div class="modal-overlay" v-if="showModal">
+          <div class="modal card">
+            <img @click="showModal = false" src="@/assets/close.png" alt="">
+            <p>Nazwa kalkulacji</p>
+            <input type="text" v-model="resultName" class="base-input" placeholder="Wpisz nazwę pod jaką zapiszesz utworzoną kalkuację">
+            <button @click="generateResults" class="button button--success">Zapisz wyniki</button>
+          </div>
+        </div>
       <div class="card">
         <h2 class="card__heading">
           <span>Punkty</span> pola
         </h2>
         <div class="table-wrapper">
-            <table id="customers">
+            <table id="table">
         <tr>
             <th>Lp.</th>
             <th>Lat</th>
@@ -37,6 +45,7 @@
         <MapView/>
       </div>
       <div class="card">
+
         <h2 class="card__heading">
           <span>Dane</span> obliczeniowe
         </h2>
@@ -46,7 +55,7 @@
         <input type="number" v-model="spacePlant" class="base-input" placeholder="Wpisz odległość pomiędzy sadzonkami (m)">
         <label for="">Odległość między słupkami środkowymi (m)</label>
         <input type="number" v-model="spacePall" class="base-input" placeholder="Wpisz odległość pomiędzy słupkami (m)">
-        <button @click="generateResults" class="button button--success">Generuj wyniki</button>
+        <button @click="showModal = true" class="button button--success">Generuj wyniki</button>
       </div>
     </div>
   </template>
@@ -64,6 +73,8 @@
         spaceRow:'',
         spacePlant:'',
         spacePall:'',
+        showModal:false,
+        resultName : '', 
       }
     },
     computed:{
@@ -74,67 +85,66 @@
     methods:{
         addPoint(){
             navigator.geolocation.getCurrentPosition((position) => {
-            let lat = position.coords.latitude+Math.random(0,1);
-            let long = position.coords.longitude+Math.random(0,1);
+            let lat = position.coords.latitude+Math.random(0,0.0001);
+            let long = position.coords.longitude+Math.random(0,0.0001);
             this.$store.commit('addPoint', {
                 lng:long,lat:lat
             })
+            this.$store.state.center = [lat,long]
         });
         },
         removePoint(idx){
             this.$store.commit('removePoint',idx)
         },
         generateResults(){
-          html2pdf(document.querySelector('.home'));
+          let newCalculation = {
+            title : this.resultName ? this.resultName : `Kalkulacja ${new Date().toLocaleDateString()} --- ${new Date().toLocaleTimeString()}`,
+            id: (Math.random() + 1).toString(36).substring(7),
+            points : this.$store.state.mapPoints,
+            center: this.$store.state.center,
+            spaceRow:this.spaceRow,
+            spacePlant:this.spacePlant,
+            spacePall:this.spacePall,
+          }
+          if(!localStorage.getItem('calculations')){
+            localStorage.setItem('calculations',JSON.stringify([newCalculation]))
+          }else{
+            let oldCalculations = JSON.parse(localStorage.getItem('calculations'))
+            oldCalculations.push(newCalculation)
+            localStorage.setItem('calculations',JSON.stringify(oldCalculations))
+          }
+          this.$router.push({ path: '/history' })
         }
     }
   }
   </script>
   <style lang="scss" scoped>
-  .card{
-    background: rgba( 255, 255, 255, 0.25 );
-    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-    backdrop-filter: blur( 4px );
-    -webkit-backdrop-filter: blur( 4px );
-    border-radius: 10px;
-    border: 1px solid rgba( 255, 255, 255, 0.18 );
-    padding:24px;
-    margin:10px;
-    display:flex;
-    flex-direction: column;
-    gap:10px;
-    &__heading{
-    font-weight: 400;
-      span{
-        font-weight: 600;
+  .home{
+    position: relative;
+    .modal-overlay{
+      position:fixed;
+      left:0;
+      top:0;
+      z-index:5;
+      width:100%;
+      height:100%;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(5px);
+      display:grid;
+      place-content: center;
+      .modal{
+        display:flex;
+      flex-direction: column;
+      gap:8px;
+      min-width: 320px;
+      img{
+        width:40px;
+        margin-left: auto;
+        cursor: pointer;
+      }
       }
     }
   }
-  .table-wrapper{
-    overflow-x: scroll;
 
-  }
-  #customers {
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-  min-width: 600px;
-}
 
-#customers td, #customers th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-#customers tr:nth-child(even){background-color: #f2f2f2;}
-
-#customers tr:hover {background-color: #ddd;}
-
-#customers th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #04AA6D;
-  color: white;
-}
   </style>

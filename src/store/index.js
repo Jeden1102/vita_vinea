@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         mapPoints: [],
+        center: [51, 51],
     },
     mutations: {
         addPoint(state, point) {

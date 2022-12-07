@@ -1,8 +1,9 @@
 <template>
     <div>
+      {{ test }}
       <l-map
         :zoom="zoom"
-        :center="center"
+        :center="this.$store.state.center"
         style="height: 700px; width: 100%"
       >
         <l-tile-layer
@@ -13,13 +14,21 @@
           :lat-lngs="points"
           :color="polyline.color"
         />
+        <l-polyline
+          :lat-lngs="baseLinePoints"
+          color="red"
+        />
         <l-marker
             v-for="(marker,idx) in this.$store.state.mapPoints"
             :key="idx"
             :draggable="true"
             :lat-lng.sync="marker.position"
             @click="alert(marker)"
-          />
+            >
+            <l-tooltip :options="{ permanent: true, interactive: true }">
+            Punkt {{ idx }}
+        </l-tooltip>
+        </l-marker>
       </l-map>
     </div>
   </template>
@@ -32,7 +41,8 @@
     LRectangle,
     LPolygon,
     LPolyline,
-    LMarker
+    LMarker,
+    LTooltip
   } from "vue2-leaflet";
   
   import { Icon } from 'leaflet';
@@ -52,7 +62,8 @@ Icon.Default.mergeOptions({
       LRectangle,
       LPolygon,
       LPolyline,
-      LMarker
+      LMarker,
+      LTooltip
     },
     computed:{
         points(){
@@ -62,13 +73,23 @@ Icon.Default.mergeOptions({
             }))
             return arr
         },
+        baseLinePoints(){
+          const points = this.$store.state.mapPoints.filter(el=>el.base === true);
+          let arr = [];
+          points.forEach(el => {
+            arr.push([el.position.lat,el.position.lng])
+          });
+          return arr;
+        },
+        test(){
+          return "ok";
+        },
         zoom(){
           return 15
         }
     },
     data() {
       return {
-        center:[51,51],
         polyline: {
           latlngs: [
             [47.334852, -1.509485],
@@ -99,7 +120,7 @@ Icon.Default.mergeOptions({
         navigator.geolocation.getCurrentPosition((position) => {
             let lat = position.coords.latitude
             let long = position.coords.longitude
-            this.center = [lat,long]
+            this.$store.state.center = [lat,long]
         });
       }
     }

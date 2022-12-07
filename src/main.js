@@ -5,7 +5,8 @@ import router from './router'
 import store from './store'
 import 'leaflet/dist/leaflet.css';
 Vue.config.productionTip = false
-
+import VueHtml2pdf from 'vue-html2pdf'
+Vue.use(VueHtml2pdf)
 new Vue({
     router,
     store,

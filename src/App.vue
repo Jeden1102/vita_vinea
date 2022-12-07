@@ -30,6 +30,7 @@
   background: url('./assets/pattern.webp');
   min-height: 100vh;
   position:relative;
+  font-size:20px;
   padding-bottom:40px;
 }
 .app{
@@ -38,6 +39,7 @@
 }
 *{
   font-family: 'Dosis', sans-serif;
+  font-size: 15px;
 }
 #nav {
   padding: 10px;
@@ -85,7 +87,7 @@
   box-shadow: 0px 8px 75px -16px rgba(66, 68, 90, 1);
   border-radius: 10px;
   .logo{
-    width:250px;
+    width:150px;
   }
   @media(min-width:768px){
     width:85%;
@@ -229,5 +231,53 @@
    }
                 
 }
+}
+.card{
+    background: rgba( 255, 255, 255, 0.25 );
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+    padding:24px;
+    margin:10px;
+    display:flex;
+    flex-direction: column;
+    gap:10px;
+    &__heading{
+    font-weight: 400;
+    font-size: 1.4rem;
+      span{
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+    }
+  }
+  .table-wrapper{
+    overflow-x: scroll;
+
+  }
+  #table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 600px;
+}
+
+#table td, #table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#table tr:nth-child(even){background-color: #f2f2f2;}
+
+#table tr:hover {background-color: #ddd;}
+
+#table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
 }
 </style>

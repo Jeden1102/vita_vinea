@@ -45,34 +45,39 @@
         <MapView/>
       </div>
       <div class="card">
-
         <h2 class="card__heading">
           <span>Dane</span> obliczeniowe
         </h2>
         <label for="">Odległość między rzędami (m)</label>
-        <input type="number" v-model="spaceRow" class="base-input" placeholder="Wpisz odległość pomiędzy rzędami (m)">
+        <input type="number" v-model="store.state.calculationData.spaceRow" class="base-input" placeholder="Wpisz odległość pomiędzy rzędami (m)">
         <label for="">Odległość między sadzonkami (m)</label>
-        <input type="number" v-model="spacePlant" class="base-input" placeholder="Wpisz odległość pomiędzy sadzonkami (m)">
+        <input type="number" v-model="store.state.calculationData.spacePlant" class="base-input" placeholder="Wpisz odległość pomiędzy sadzonkami (m)">
         <label for="">Odległość między słupkami środkowymi (m)</label>
-        <input type="number" v-model="spacePall" class="base-input" placeholder="Wpisz odległość pomiędzy słupkami (m)">
-        <button @click="showModal = true" class="button button--success">Generuj wyniki</button>
+        <input type="number" v-model="store.state.calculationData.spacePall" class="base-input" placeholder="Wpisz odległość pomiędzy słupkami (m)">
+      </div>
+      <div class="card">
+        <div class="card__heading">
+          Wyniki <span>obliczeń</span>
+        </div>
+        <Results/>
+        <button @click="showModal = true" class="button button--success">Zapisz wyniki</button>
       </div>
     </div>
   </template>
   
   <script>
   import MapView from '@/components/MapView.vue';
+  import Results from '@/components/Results.vue';
   import html2pdf from "html2pdf.js";
   export default {
     name: 'Home',
     components: {
-      MapView
+      MapView,
+      Results
     },
     data() {
       return {
-        spaceRow:'',
-        spacePlant:'',
-        spacePall:'',
+        store:this.$store,
         showModal:false,
         resultName : '', 
       }
@@ -85,8 +90,8 @@
     methods:{
         addPoint(){
             navigator.geolocation.getCurrentPosition((position) => {
-            let lat = position.coords.latitude+Math.random(0,0.0001);
-            let long = position.coords.longitude+Math.random(0,0.0001);
+            let lat = position.coords.latitude
+            let long = position.coords.longitude
             this.$store.commit('addPoint', {
                 lng:long,lat:lat
             })
@@ -102,10 +107,11 @@
             id: (Math.random() + 1).toString(36).substring(7),
             points : this.$store.state.mapPoints,
             center: this.$store.state.center,
-            spaceRow:this.spaceRow,
-            spacePlant:this.spacePlant,
-            spacePall:this.spacePall,
+            spaceRow:this.$store.state.calculationData.spaceRow,
+            spacePlant:this.$store.state.calculationData.spacePlant,
+            spacePall:this.$store.state.calculationData.spacePall,
           }
+          console.log(newCalculation)
           if(!localStorage.getItem('calculations')){
             localStorage.setItem('calculations',JSON.stringify([newCalculation]))
           }else{

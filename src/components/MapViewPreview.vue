@@ -70,6 +70,7 @@ Icon.Default.mergeOptions({
             this.points.forEach((el=>{
                 arr.push([el.position.lat,el.position.lng])
             }))
+            arr.push(arr[0])
             return arr
         },
         baseLinePoints(){

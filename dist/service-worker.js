@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/vita_vinea/precache-manifest.ff30e4888df49ab33d2e928b23886db4.js"
+  "/vita_vinea/precache-manifest.cb4ff16b8ea6d7a02b9a8cfee7e8d230.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "app"});

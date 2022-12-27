@@ -1,6 +1,6 @@
 <template>
     <div>
-      {{ test }}
+      <span style="display:none">{{ computeSurface }}</span>
       <l-map
         :zoom="zoom"
         :center="this.$store.state.center"
@@ -26,7 +26,9 @@
             @click="alert(marker)"
             >
             <l-tooltip :options="{ permanent: true, interactive: true }">
-            Punkt {{ idx }}
+            <span class="point-tooltip"><b>{{ idx }}</b> </span>
+           <span v-if="(idx>0)">{{ distanceBetweenPoints[idx-1] }}m do pkt {{ idx-1 }}</span>
+           <span v-else-if="(idx==0) && points.length>2"> {{ distanceBetweenPoints[distanceBetweenPoints.length-1] }}m do pkt {{ points.length-2 }}</span>
         </l-tooltip>
         </l-marker>
       </l-map>
@@ -46,7 +48,7 @@
   } from "vue2-leaflet";
   
   import { Icon } from 'leaflet';
-
+  import { computeArea ,LatLng} from 'spherical-geometry-js/src/index';
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -71,6 +73,10 @@ Icon.Default.mergeOptions({
             this.$store.state.mapPoints.forEach((el=>{
                 arr.push([el.position.lat,el.position.lng])
             }))
+            if(this.$store.state.mapPoints.length>1){
+              const firstPoint = this.$store.state.mapPoints[0].position
+            arr.push([firstPoint.lat,firstPoint.lng])
+            }
             return arr
         },
         baseLinePoints(){
@@ -79,10 +85,60 @@ Icon.Default.mergeOptions({
           points.forEach(el => {
             arr.push([el.position.lat,el.position.lng])
           });
+
           return arr;
         },
-        test(){
-          return "ok";
+        distanceBetweenPoints(){
+          let points = [];
+          if(this.$store.state.mapPoints.length>2){
+            points = [...this.$store.state.mapPoints,this.$store.state.mapPoints[0]];
+          }else{
+            points = this.$store.state.mapPoints
+          }
+          this.$store.state.results.circuit = 0;
+          if(points.length>1){
+            let arr = [];
+          points.forEach((point,i)=>{
+            if(points[i-1]){
+              const lat1 = points[i].position.lat;
+              const lat2 = points[i-1].position.lat;
+              const lon1 = points[i].position.lng;
+              const lon2 = points[i-1].position.lng;
+              const R = 6371e3; // metres
+              const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
+              const φ2 = (lat2 * Math.PI) / 180;
+              const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+              const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+              const a =
+                Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+              const d = R * c;
+              arr.push(Math.floor(d))
+              this.$store.state.results.circuit += Math.floor(d);
+            }
+
+          })
+          return arr;
+          }
+
+        },
+        computeSurface(){
+          let points = [];
+          if(this.$store.state.mapPoints.length>2){
+            points = [...this.$store.state.mapPoints,this.$store.state.mapPoints[0]];
+          }else{
+            points = this.$store.state.mapPoints
+          }
+               //convert coords to latlng
+     var latLngs = points.map(function(coord) { 
+        return new LatLng(coord.position.lat, coord.position.lng);
+     });
+     this.$store.state.results.surface = Math.floor(computeArea(latLngs))
+     console.log(this.$store.state.results.surface)
+     return computeArea(latLngs)
         },
         zoom(){
           return 15
@@ -90,6 +146,7 @@ Icon.Default.mergeOptions({
     },
     data() {
       return {
+        circuit:0,
         polyline: {
           latlngs: [
             [47.334852, -1.509485],
@@ -126,3 +183,18 @@ Icon.Default.mergeOptions({
     }
   };
   </script>
+  <style lang="scss">
+.leaflet-tooltip{
+  .point-tooltip{
+    display:block;
+    width:fit-content;
+    background:#04AA6D;
+    padding:5px;
+    width:20px;
+    height:20px;
+    display:grid;
+    place-content: center;
+    border-radius: 50%;
+  }
+}
+</style>

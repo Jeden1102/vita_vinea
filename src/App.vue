@@ -16,6 +16,17 @@
   </div>
   </div>
 </template>
+<script>
+export default{
+  created() {
+  if (this.$workbox) {
+    this.$workbox.addEventListener("waiting", () => {
+      this.showUpdateUI = true;
+    });
+  }
+}
+}
+</script>
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200;300;400;500;600;700;800&display=swap');

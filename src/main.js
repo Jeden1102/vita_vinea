@@ -6,6 +6,9 @@ import store from './store'
 import 'leaflet/dist/leaflet.css';
 Vue.config.productionTip = false
 import VueHtml2pdf from 'vue-html2pdf'
+import wb from "./registerServiceWorker";
+
+Vue.prototype.$workbox = wb;
 Vue.use(VueHtml2pdf)
 new Vue({
     router,

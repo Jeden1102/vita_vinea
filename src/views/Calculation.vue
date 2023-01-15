@@ -18,7 +18,7 @@
             <th>Lp.</th>
             <th>Lat</th>
             <th>Lon</th>
-            <th>Akcje</th>
+            <th>Bok*</th>
             <th>Podstawa</th>
         </tr>
         <tr v-for="(point,idx) in this.$store.state.mapPoints" :key="idx">
@@ -41,6 +41,7 @@
         </tr>
         </table>
         </div>
+        *bok - bok wzdluż którego maja "biec" kolejne rzędy.
         <button @click="addPoint" class="button button--primary">Dodaj punkt</button>
         <MapView/>
       </div>
@@ -110,6 +111,9 @@
             spaceRow:this.$store.state.calculationData.spaceRow,
             spacePlant:this.$store.state.calculationData.spacePlant,
             spacePall:this.$store.state.calculationData.spacePall,
+            circuit:this.$store.state.results.circuit,
+            surface:this.$store.state.results.surface,
+            getRowNumber:this.$store.getters.getRowNumber,
           }
           console.log(newCalculation)
           if(!localStorage.getItem('calculations')){

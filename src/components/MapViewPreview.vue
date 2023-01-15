@@ -82,7 +82,7 @@ Icon.Default.mergeOptions({
           return arr;
         },
         zoom(){
-          return 10
+          return 16
         }
     },
     data() {
